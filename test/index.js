@@ -16,6 +16,12 @@ var it = redtape({
   }
 });
 
+function prop(name) {
+  return function (obj) {
+    return obj[name];
+  };
+}
+
 it('should be able to put and read the queue', 3, function(t, db) {
   var q = queue(db);
   var data = {
@@ -81,12 +87,6 @@ it('reading should be atomic', 1, function(t, db) {
     });
   }
 
-  function prop(name) {
-    return function (obj) {
-      return obj[name];
-    };
-  }
-
   function check() {
     var hits = uniq(results.map(prop('id')));
     t.equal(hits.length, 5);
@@ -109,4 +109,35 @@ it('reading should block until data is there', 3, function(t, db) {
   setTimeout(function () {
     q.queue.push(data);
   }, 20);
+});
+
+it('should be able to change the prioritation strategy', 5, function(t, db) {
+  var q = queue(db, prop('value'));
+  var next = after(5, dequeue);
+  range(0, 5).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      name: 'Name ' + i,
+      value: -(42 + i)
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      q.queue.read(function (err, value, key) {
+        results.push(value);
+        next();
+      });
+    });
+  }
+
+  function check() {
+    var last = -Infinity;
+    results.forEach(function (result) {
+      t.ok(result.value > last);
+      last = result.value;
+    });
+  }
 });
