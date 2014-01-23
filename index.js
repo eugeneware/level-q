@@ -1,5 +1,4 @@
 var timestamp = require('monotonic-timestamp'),
-    uuid = require('node-uuid'),
     peek = require('level-peek'),
     setImmediate = global.setImmediate || process.nextTick,
     slice = Array.prototype.slice;
@@ -31,7 +30,8 @@ module.exports = function (db, opts) {
 function push(db, data, cb) {
   var key = db.queue.orderFn(data);
   if (!Array.isArray(key)) key = [key];
-  key.push(uuid());
+  // makes keys unique, as well as ordering similar keys by timestamp ASC
+  key.push(timestamp());
   db.put(key, data, function () {
     cb && cb.apply(null, arguments);
     kick(db);
