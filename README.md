@@ -1,6 +1,6 @@
 # level-q
 
-FIFO queueing for leveldb/levelup
+Priority queuing for leveldb/levelup
 
 [![build status](https://secure.travis-ci.org/eugeneware/level-q.png)](http://travis-ci.org/eugeneware/level-q)
 

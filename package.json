@@ -1,7 +1,7 @@
 {
   "name": "level-q",
   "version": "0.0.1",
-  "description": "FIFO queueing for leveldb/levelup",
+  "description": "Priority queuing for leveldb/levelup",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/tape test/*.js"
