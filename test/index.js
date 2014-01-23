@@ -219,3 +219,39 @@ it('should be able to have queue dequeue restrictions', 15, function(t, db) {
     });
   }
 });
+
+it('should be able to rebind after dequeueing', 1, function(t, db) {
+  var q = queue(db);
+  var next = after(15, dequeue);
+  range(0, 15).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      name: 'Name ' + i,
+      value: 42 + i
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      var readCount = 0;
+      (function read() {
+        q.queue.read(function (err, value, key) {
+          results.push(value);
+          readCount++;
+          if (readCount === 3) {
+            next();
+          } else {
+            setImmediate(read);
+          }
+        });
+      })();
+    });
+  }
+
+  function check() {
+    var hits = uniq(results.map(prop('id')));
+    t.equal(hits.length, 15);
+  }
+});
