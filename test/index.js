@@ -185,7 +185,7 @@ it('should be able to have queue dequeue restrictions', 10, function(t, db) {
     return Date.now() >= data.next;
   }
 
-  var q = queue(db, prop('next'), release);
+  var q = queue(db, { order: prop('next'), release: release, retry: 0 });
   var next = after(5, dequeue);
   var delay = 20;
   range(0, 5).forEach(function (i) {

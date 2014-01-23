@@ -2,15 +2,23 @@ var timestamp = require('monotonic-timestamp'),
     peek = require('level-peek'),
     setImmediate = global.setImmediate || process.nextTick;
 
-module.exports = function (db, orderFn, releaseFn) {
+module.exports = function (db, opts) {
   if (typeof db.queue === 'undefined') {
+    if (typeof opts === 'function') {
+      opts = {
+        order: opts
+      };
+    }
+    opts = opts || {};
+
     db.queue = {
-      push: push.bind(null, db),
-      read: read.bind(null, db),
-      orderFn: orderFn || timestamp,
-      releaseFn: releaseFn || Boolean.bind(null, true),
-      _readers: [],
-      _reading: false
+      push:      push.bind(null, db),
+      read:      read.bind(null, db),
+      orderFn:   opts.order   || timestamp,
+      releaseFn: opts.release || Boolean.bind(null, true),
+      retry:     opts.retry   || 100,
+      _readers:  [],
+      _reading:  false
     };
   }
 
