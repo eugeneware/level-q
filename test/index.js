@@ -179,13 +179,14 @@ it('should be able to have complex priority keys', 10, function(t, db) {
   }
 });
 
-it('should be able to have queue dequeue restrictions', 10, function(t, db) {
+it('should be able to have queue dequeue restrictions', 15, function(t, db) {
   var now = Date.now();
   function release(data) {
     return Date.now() >= data.next;
   }
 
-  var q = queue(db, { order: prop('next'), release: release, retry: 0 });
+  var retry = 100;
+  var q = queue(db, { order: prop('next'), release: release, retry: retry });
   var next = after(5, dequeue);
   var delay = 20;
   range(0, 5).forEach(function (i) {
@@ -211,8 +212,9 @@ it('should be able to have queue dequeue restrictions', 10, function(t, db) {
     var last = 0;
     var _now = Date.now();
     results.forEach(function (result) {
-      t.ok(_now >= result.next, 'delayed dequeue');
-      t.ok(result.next > last);
+      t.ok(_now >= result.next,   'delayed dequeue');
+      t.ok(_now >= (now + retry), 'retry');
+      t.ok(result.next > last,    'in order');
       last = result.next;
     });
   }
