@@ -4,6 +4,7 @@ var redtape = require('redtape'),
     after = require('after'),
     range = require('range'),
     uniq = require('lodash.uniq'),
+    setImmediate = global.setImmediate || process.nextTick,
     queue = require('..');
 
 var it = redtape({
