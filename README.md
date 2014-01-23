@@ -124,7 +124,7 @@ scheduled time in the future (eg. like a cron job);
 var bytewise = require('bytewise'),
     level = require('level')
     range = require('range'),
-    queue = require('..');
+    queue = require('level-q');
 
 // create a priority queue based on time to next service
 var db = queue(
