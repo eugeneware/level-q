@@ -1,0 +1,44 @@
+{
+  "name": "level-q",
+  "version": "0.0.1",
+  "description": "FIFO queueing for leveldb/levelup",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eugeneware/level-q"
+  },
+  "keywords": [
+    "leveldb",
+    "levelup",
+    "queue",
+    "queueing",
+    "fifo",
+    "atomic",
+    "job",
+    "ms",
+    "amqp",
+    "mq",
+    "msmq"
+  ],
+  "author": "Eugene Ware <eugene@noblesamurai.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/eugeneware/level-q/issues"
+  },
+  "dependencies": {
+    "bytewise": "~0.7.0",
+    "monotonic-timestamp": "0.0.8",
+    "level-peek": "~1.0.6",
+    "range": "0.0.2",
+    "after": "~0.8.1"
+  },
+  "devDependencies": {
+    "redtape": "~0.1.0",
+    "tape": "~2.3.2",
+    "level-test": "~1.6.0",
+    "lodash.uniq": "~2.4.1"
+  }
+}
