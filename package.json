@@ -33,7 +33,8 @@
     "monotonic-timestamp": "0.0.8",
     "level-peek": "~1.0.6",
     "range": "0.0.2",
-    "after": "~0.8.1"
+    "after": "~0.8.1",
+    "node-uuid": "~1.4.1"
   },
   "devDependencies": {
     "redtape": "~0.1.0",

@@ -1,4 +1,5 @@
 var timestamp = require('monotonic-timestamp'),
+    uuid = require('node-uuid'),
     peek = require('level-peek'),
     setImmediate = global.setImmediate || process.nextTick;
 
@@ -26,7 +27,10 @@ module.exports = function (db, opts) {
 }
 
 function push(db, data, cb) {
-  db.put(db.queue.orderFn(data), data, function () {
+  var key = db.queue.orderFn(data);
+  if (!Array.isArray(key)) key = [key];
+  key.push(uuid());
+  db.put(key, data, function () {
     cb && cb.apply(null, arguments);
     kick(db);
   });
