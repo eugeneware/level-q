@@ -1,6 +1,6 @@
 {
   "name": "level-q",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Priority queuing for leveldb/levelup",
   "main": "index.js",
   "scripts": {
