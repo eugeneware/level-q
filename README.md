@@ -153,7 +153,6 @@ db.queue.push({
 // The job will ONLY be available for processing once the 5 seconds has passed
 db.queue.listen(function (err, value, key, next) {
   if (err) throw err;
-  // do the work
   switch (value.state) {
     case 'square':
       // do the work
@@ -166,7 +165,9 @@ db.queue.listen(function (err, value, key, next) {
       break;
 
     case 'sin':
+      // do the work
       value.sinResult = Math.sin(value.n);
+
       console.log(value);
       // Should print out:
       // { deadline: 1390487269236,
