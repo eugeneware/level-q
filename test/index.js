@@ -178,3 +178,42 @@ it('should be able to have complex priority keys', 10, function(t, db) {
     });
   }
 });
+
+it('should be able to have queue dequeue restrictions', 10, function(t, db) {
+  var now = Date.now();
+  function release(data) {
+    return Date.now() >= data.next;
+  }
+
+  var q = queue(db, prop('next'), release);
+  var next = after(5, dequeue);
+  var delay = 20;
+  range(0, 5).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      name: 'Name ' + i,
+      next: now + delay + i
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      q.queue.read(function (err, value, key) {
+        results.push(value);
+        next();
+      });
+    });
+  }
+
+  function check() {
+    var last = 0;
+    var _now = Date.now();
+    results.forEach(function (result) {
+      t.ok(_now >= result.next, 'delayed dequeue');
+      t.ok(result.next > last);
+      last = result.next;
+    });
+  }
+});

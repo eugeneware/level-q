@@ -2,12 +2,13 @@ var timestamp = require('monotonic-timestamp'),
     peek = require('level-peek'),
     setImmediate = global.setImmediate || process.nextTick;
 
-module.exports = function (db, orderFn) {
+module.exports = function (db, orderFn, releaseFn) {
   if (typeof db.queue === 'undefined') {
     db.queue = {
       push: push.bind(null, db),
       read: read.bind(null, db),
       orderFn: orderFn || timestamp,
+      releaseFn: releaseFn || Boolean.bind(null, true),
       _readers: [],
       _reading: false
     };
@@ -38,6 +39,15 @@ function dequeue(db, cb) {
       return db.queue._readers.push(cb);
     }
     if (err) return cb(err);
+    if (!db.queue.releaseFn(value)) {
+      // add back to queue and wait, but unblock read lock
+      db.queue._reading = false;
+      db.queue._readers.push(cb)
+      setTimeout(function () {
+        kick(db);
+      }, 100);
+      return ;
+    }
     db.del(key, function (err) {
       if (err) return cb(err);
       cb(err, value, key);
