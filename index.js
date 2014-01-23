@@ -43,6 +43,7 @@ function dequeue(db, cb) {
       // add back to queue and wait, but unblock read lock
       db.queue._reading = false;
       db.queue._readers.push(cb)
+      // try again in 100ms
       setTimeout(function () {
         kick(db);
       }, 100);
