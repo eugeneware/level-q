@@ -12,6 +12,7 @@
   },
   "keywords": [
     "leveldb",
+    "priority",
     "levelup",
     "queue",
     "queueing",
