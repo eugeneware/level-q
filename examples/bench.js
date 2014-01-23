@@ -21,14 +21,13 @@ function prop(name) {
 }
 
 function produce() {
-  var next = after(n, consume);
   range(0, n).forEach(function (i) {
     db.queue.push({
       id: i,
       name: 'Name ' + i,
-      next: start + Math.floor(Math.random() * 500),
+      next: start + Math.floor(Math.random() * 100),
       value: 42 + i
-    }, next);
+    });
   });
 }
 
@@ -53,6 +52,7 @@ function consume() {
 }
 
 produce();
+consume();
 
 function done() {
   var elapsed = Date.now() - start;
