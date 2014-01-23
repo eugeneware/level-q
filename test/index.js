@@ -141,3 +141,40 @@ it('should be able to change the prioritation strategy', 5, function(t, db) {
     });
   }
 });
+
+it('should be able to have complex priority keys', 10, function(t, db) {
+  function pri(data) {
+    return [data.priority, data.value];
+  }
+  var q = queue(db, pri);
+  var next = after(5, dequeue);
+  range(0, 5).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      priority: String.fromCharCode('A'.charCodeAt(0) + (i % 3)),
+      name: 'Name ' + i,
+      value: -(42 + i)
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      q.queue.read(function (err, value, key) {
+        results.push(value);
+        next();
+      });
+    });
+  }
+
+  function check() {
+    var lastValue = -Infinity, lastPriority = '';
+    results.forEach(function (result) {
+      t.ok(result.priority >= lastPriority);
+      t.ok(result.priority !== lastPriority || result.value > last);
+      lastPriority = result.priority;
+      last = result.value;
+    });
+  }
+});
