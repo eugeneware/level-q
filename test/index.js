@@ -16,33 +16,39 @@ var it = redtape({
   }
 });
 
-it('should be able to put and read the queue', 2, function(t, db) {
+it('should be able to put and read the queue', 3, function(t, db) {
   var q = queue(db);
   var data = {
     id: 1,
     name: 'Eugene',
     value: 42
   };
-  q.queue.push(data);
-  q.queue.read(function (err, value) {
+  q.queue.push(data, read);
+  function read(err) {
     t.notOk(err);
-    t.deepEquals(data, value);
-  });
+    q.queue.read(function (err, value) {
+      t.notOk(err);
+      t.deepEquals(data, value);
+    });
+  }
 });
 
-it('reading should dequeue the item', 3, function(t, db) {
+it('reading should dequeue the item', 4, function(t, db) {
   var q = queue(db);
   var data = {
     id: 1,
     name: 'Eugene',
     value: 42
   };
-  q.queue.push(data);
-  q.queue.read(function (err, value, key) {
+  q.queue.push(data, read);
+  function read(err) {
     t.notOk(err);
-    t.deepEquals(data, value);
-    get(key);
-  });
+    q.queue.read(function (err, value, key) {
+      t.notOk(err);
+      t.deepEquals(data, value);
+      get(key);
+    });
+  }
 
   function get(key) {
     q.get(key, check);
