@@ -17,7 +17,10 @@ module.exports = function (db, orderFn) {
 }
 
 function push(db, data, cb) {
-  db.put(db.queue.orderFn(data), data, cb || noop);
+  db.put(db.queue.orderFn(data), data, function () {
+    cb && cb.apply(null, arguments);
+    kick(db);
+  });
 }
 
 function read(db, cb) {
@@ -29,6 +32,11 @@ function read(db, cb) {
 function dequeue(db, cb) {
   cb = cb || noop;
   peek.first(db, { start: null, end: undefined }, function (err, key, value) {
+    if (err && err.message === 'range not found') {
+      // add back to queue and wait, but unblock read lock
+      db.queue._reading = false;
+      return db.queue._readers.push(cb);
+    }
     if (err) return cb(err);
     db.del(key, function (err) {
       if (err) return cb(err);

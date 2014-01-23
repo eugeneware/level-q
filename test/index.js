@@ -92,3 +92,21 @@ it('reading should be atomic', 1, function(t, db) {
     t.equal(hits.length, 5);
   }
 });
+
+it('reading should block until data is there', 3, function(t, db) {
+  var q = queue(db);
+  var data = {
+    id: 1,
+    name: 'Eugene',
+    value: 42
+  };
+  q.queue.read(function (err, value) {
+    t.notOk(err);
+    t.deepEquals(data, value);
+    t.ok(Date.now() - now >= 20);
+  });
+  var now = Date.now();
+  setTimeout(function () {
+    q.queue.push(data);
+  }, 20);
+});
