@@ -159,7 +159,7 @@ db.queue.listen(function (err, value, key, next) {
       // do the work
       value.squareResult = value.n * value.n;
 
-      // schedule then nexzt part of work 2 seconds in the future
+      // schedule then next part of work 2 seconds in the future
       value.state = 'sin';
       value.deadline = Date.now() + 2000;
       db.queue.push(value, next);
