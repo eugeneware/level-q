@@ -29,10 +29,11 @@ db.queue.push({
 db.queue.listen(function (err, value) {
   if (err) throw err;
   value.log.push(work(value.value++));
-  console.log(value);
   if (value.value < 3) {
     value.next += delay;
     db.queue.push(value);
+  } else {
+    console.log(value);
   }
 });
 

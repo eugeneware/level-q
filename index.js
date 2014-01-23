@@ -1,7 +1,8 @@
 var timestamp = require('monotonic-timestamp'),
     uuid = require('node-uuid'),
     peek = require('level-peek'),
-    setImmediate = global.setImmediate || process.nextTick;
+    setImmediate = global.setImmediate || process.nextTick,
+    slice = Array.prototype.slice;
 
 module.exports = function (db, opts) {
   if (typeof db.queue === 'undefined') {
@@ -46,8 +47,15 @@ function read(db, cb) {
 function listen(db, cb) {
   (function next() {
     read(db, function () {
-      cb.apply(null, arguments);
-      setImmediate(next);
+      var args = slice.call(arguments);
+      var doNext = setImmediate.bind(null, next);
+      if (cb.length === 4) {
+        args.push(doNext);
+        cb.apply(null, args);
+      } else {
+        cb.apply(null, args);
+        doNext();
+      }
     });
   })();
 }

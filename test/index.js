@@ -256,7 +256,7 @@ it('should be able to rebind after dequeueing', 1, function(t, db) {
   }
 });
 
-it('should be able to listen to a queue', 1, function(t, db) {
+it('should be able to listen to a queue (async)', 1, function(t, db) {
   var q = queue(db);
   var next = after(15, dequeue);
   range(0, 15).forEach(function (i) {
@@ -272,7 +272,41 @@ it('should be able to listen to a queue', 1, function(t, db) {
     var next = after(5, check);
     range(0, 5).forEach(function (i) {
       var readCount = 0;
-      q.queue.listen(function (err, value, key) {
+      q.queue.listen(function (err, value, key, cb) {
+        results.push(value);
+        readCount++;
+        if (readCount === 3) {
+          next();
+        } else {
+          setImmediate(cb);
+        }
+      });
+    });
+  }
+
+  function check() {
+    var hits = uniq(results.map(prop('id')));
+    t.equal(hits.length, 15);
+  }
+});
+
+it('should be able to listen to a queue (sync)', 1, function(t, db) {
+  var q = queue(db);
+  var next = after(15, dequeue);
+  range(0, 15).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      name: 'Name ' + i,
+      value: 42 + i
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      var readCount = 0;
+      q.queue.listen(function (err, value) {
         results.push(value);
         readCount++;
         if (readCount === 3) {
