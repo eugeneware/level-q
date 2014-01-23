@@ -36,18 +36,14 @@ function consume() {
   var next = after(m, done);
   range(0, m).forEach(function (i) {
     var count = 0;
-    (function read() {
-      db.queue.read(function (err, value, key) {
-        if (err) throw err;
-        results.push(value);
-        count++;
-        if (count === p) {
-          next();
-        } else {
-          setImmediate(read);
-        }
-      });
-    })();
+    db.queue.listen(function (err, value, key) {
+      if (err) throw err;
+      results.push(value);
+      count++;
+      if (count === p) {
+        next();
+      }
+    });
   });
 }
 

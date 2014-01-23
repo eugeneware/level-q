@@ -255,3 +255,35 @@ it('should be able to rebind after dequeueing', 1, function(t, db) {
     t.equal(hits.length, 15);
   }
 });
+
+it('should be able to listen to a queue', 1, function(t, db) {
+  var q = queue(db);
+  var next = after(15, dequeue);
+  range(0, 15).forEach(function (i) {
+    q.queue.push({
+      id: i,
+      name: 'Name ' + i,
+      value: 42 + i
+    }, next);
+  });
+
+  var results = [];
+  function dequeue() {
+    var next = after(5, check);
+    range(0, 5).forEach(function (i) {
+      var readCount = 0;
+      q.queue.listen(function (err, value, key) {
+        results.push(value);
+        readCount++;
+        if (readCount === 3) {
+          next();
+        }
+      });
+    });
+  }
+
+  function check() {
+    var hits = uniq(results.map(prop('id')));
+    t.equal(hits.length, 15);
+  }
+});

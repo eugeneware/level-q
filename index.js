@@ -15,6 +15,7 @@ module.exports = function (db, opts) {
     db.queue = {
       push:      push.bind(null, db),
       read:      read.bind(null, db),
+      listen:    listen.bind(null, db),
       orderFn:   opts.order   || timestamp,
       releaseFn: opts.release || Boolean.bind(null, true),
       retry:     opts.retry   || 100,
@@ -40,6 +41,15 @@ function read(db, cb) {
   cb = cb || noop;
   db.queue._readers.push(cb);
   kick(db);
+}
+
+function listen(db, cb) {
+  (function next() {
+    read(db, function () {
+      cb.apply(null, arguments);
+      setImmediate(next);
+    });
+  })();
 }
 
 function dequeue(db, cb) {
