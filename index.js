@@ -72,7 +72,7 @@ function dequeue(db, cb) {
     if (!db.queue.releaseFn(value)) {
       // add back to queue and wait, but unblock read lock
       db.queue._reading = false;
-      db.queue._readers.push(cb)
+      db.queue._readers.push(cb);
       // try again in retry ms
       setTimeout(function () {
         kick(db);
