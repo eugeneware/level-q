@@ -81,7 +81,7 @@ function dequeue(db, cb) {
     }
     db.del(key, function (err) {
       if (err) return cb(err);
-      cb(err, value, key);
+      cb(null, value, key);
     });
   });
 }
