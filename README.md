@@ -24,7 +24,7 @@ var queue = require('level-q'),
     bytewise = require('bytewise');
 
 // instantiate queue (adds a 'queue' property on the db)
-var db = queue(level('/db/path', { keyEncoding: bytewise, valueEncoding: 'json' }));
+var q = queue(level('/db/path', { keyEncoding: bytewise, valueEncoding: 'json' }));
 
 // data to put in queue
 var data = {
