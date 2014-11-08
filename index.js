@@ -63,7 +63,7 @@ function listen(db, cb) {
 function dequeue(db, cb) {
   cb = cb || noop;
   peek.first(db, { start: null, end: undefined }, function (err, key, value) {
-    if (err && err.message === 'range not found') {
+    if ((err && err.message === 'range not found') || typeof key === 'undefined') {
       // add back to queue and wait, but unblock read lock
       db.queue._reading = false;
       return db.queue._readers.push(cb);
